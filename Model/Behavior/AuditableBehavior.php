@@ -207,6 +207,10 @@ class AuditableBehavior extends \ModelBehavior {
 			) {
 				continue;
 			}
+			
+			if (is_array($value)) {
+                		$value = '<<'.serialize($value).'>>';
+            		}
 
 			if ($created) {
 				$delta = array(
@@ -220,13 +224,17 @@ class AuditableBehavior extends \ModelBehavior {
 				if (Hash::check($this->_getOriginalDataForModel($Model), $property)
 					&& Hash::get($this->_getOriginalDataForModel($Model), $property) != $value
 				) {
+					$oldValue = Hash::get($this->_getOriginalDataForModel($Model), $property);
+					if (is_array($oldValue)) {
+						$oldValue = '<<'.serialize($oldValue).'>>';
+					}
 					// If the property exists in the original _and_ the
 					// value is different, store it.
 					$delta = array(
 						'AuditDelta' => array(
 							'property_name' => $property,
 							'old_value' => Hash::get($this->_getOriginalDataForModel($Model), $property),
-							'new_value' => $value,
+							'new_value' => $oldValue,
 						),
 					);
 				}
